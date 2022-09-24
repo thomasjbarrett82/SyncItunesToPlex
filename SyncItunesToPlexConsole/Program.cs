@@ -146,7 +146,7 @@ namespace SyncItunesToPlexConsole {
             // iTunes can change the ID's, so need to sync config if needed
             var currentItunesPlaylists = _itunesDb.GetPlaylists().ToList();
 
-            var diff = _config.ItunesPlaylists.Except(currentItunesPlaylists, new ItunesPlaylistComparer());
+            var diff = currentItunesPlaylists.Except(_config.ItunesPlaylists, new ItunesPlaylistComparer());
             if (diff.Count() == 0)
                 return;
 
@@ -157,6 +157,8 @@ namespace SyncItunesToPlexConsole {
 
                 newPC.MustSync = oldPC.MustSync;
             }
+
+            _config.ItunesPlaylists = currentItunesPlaylists;
 
             await AppConfig.SaveConfigASync(_config, configPath);
         }
