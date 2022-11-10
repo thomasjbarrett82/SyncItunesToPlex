@@ -54,6 +54,7 @@
                 .Replace("Å", "%C3%85")
                 .Replace("ä", "%C3%A4")
                 .Replace("á", "%C3%A1")
+                .Replace("å", "%C3%A5")
                 .Replace("ç", "%C3%A7")
                 .Replace("É", "%C3%89")
                 .Replace("ê", "%C3%AA")
