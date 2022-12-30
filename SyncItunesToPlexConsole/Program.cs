@@ -131,7 +131,7 @@ namespace SyncItunesToPlexConsole {
             if (!File.Exists(_config.ItunesLibraryPath))
                 ExitApp("iTunes library file does not exist");
 
-            _itunesDb = new(_config.ItunesLibraryPath);
+            _itunesDb = new(_config.ItunesLibraryPath!);
 
             if (_config.ItunesPlaylists == null || _config.ItunesPlaylists.Count == 0) {
                 _config.ItunesPlaylists = _itunesDb.GetPlaylists().ToList();

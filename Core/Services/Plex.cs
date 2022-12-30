@@ -60,6 +60,11 @@ namespace Core.Services
             tracks.ForEach(t => t.ShortAlbumName = (t.FileName ?? "").GetPlexShortAlbumName());
             tracks.ForEach(t => t.ShortArtistName = (t.FileName ?? "").GetPlexShortArtistName());
 
+#if DEBUG
+            Console.WriteLine(@"Writing debug Plex tracks to C:\Temp.");
+            tracks.SaveToTempFile();
+#endif
+
             return tracks;
         }
 
@@ -95,6 +100,8 @@ namespace Core.Services
                 throw new NullReferenceException(nameof(PlexTracksResponse));
 
             var tracks = response.MediaContainer.Metadata;
+            if (tracks == null)
+                return Enumerable.Empty<PlexTrack>();
 
             tracks.ForEach(t => t.ShortFileName = (t.FileName ?? "").GetPlexShortFileName());
             tracks.ForEach(t => t.ShortAlbumName = (t.FileName ?? "").GetPlexShortAlbumName());
