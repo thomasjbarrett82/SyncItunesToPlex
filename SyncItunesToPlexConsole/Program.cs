@@ -47,7 +47,7 @@ namespace SyncItunesToPlexConsole {
                     Console.WriteLine($"{DateTime.Now:yyMMdd HH:mm:ss} - Synchronized track ratings.");
 
                     SyncAlbumRatings();
-                    Console.WriteLine($"{DateTime.Now:yyMMdd HH:mm:ss} - Synchronized artist ratings.");
+                    Console.WriteLine($"{DateTime.Now:yyMMdd HH:mm:ss} - Synchronized album ratings.");
 
                     SyncArtistRatings();
                     Console.WriteLine($"{DateTime.Now:yyMMdd HH:mm:ss} - Synchronized artist ratings.");
