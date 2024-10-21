@@ -25,7 +25,7 @@ namespace SyncItunesToPlexConsole {
                 _matchedTracks = _matcher.MatchItunesToPlexTracks(plexSection.Id).ToList();
                 Console.WriteLine($"{DateTime.Now:yyMMdd HH:mm:ss} - Tracks matched.");
 
-                var plexPlaylists = _plexDb.GetPlaylists(plexSection.Id); //Plex.GetPlaylists(_plexDb, plexSection.Id);
+                var plexPlaylists = _plexDb.GetPlaylists(plexSection.Id) ?? new List<PlexPlaylist>(); //Plex.GetPlaylists(_plexDb, plexSection.Id);
                 Console.WriteLine($"{DateTime.Now:yyMMdd HH:mm:ss} - Retrieved Plex playlists.");
 
                 // if playlists must sync, do it
@@ -177,6 +177,11 @@ namespace SyncItunesToPlexConsole {
             List<PlexTrack>? tracksToRemove;
             List<PlexTrack>? tracksToAdd;
 
+            if (playlistsToSync == null)
+                throw new ArgumentNullException(nameof(playlistsToSync));
+            if (plexPlaylists == null)
+                throw new ArgumentNullException(nameof(plexPlaylists));
+
             foreach (var iPlaylist in playlistsToSync) {
                 if (string.IsNullOrEmpty(iPlaylist.Name))
                     continue;
@@ -262,7 +267,7 @@ namespace SyncItunesToPlexConsole {
         /// <param name="message"></param>
         private static void ExitApp(string message) {
             Console.WriteLine($"{message}, press any key to exit.");
-            Console.ReadKey();
+            Console.Read();
             Environment.Exit(0);
         }
     }
