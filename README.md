@@ -34,3 +34,7 @@ The app will also populate the Plex library sections config. Find the music libr
 * MustSyncPlaylists
   * Flag for synchronizing playlists. True will sync, false will not.
 
+## Publish
+
+Use the following command to create the publish file:
+` dotnet publish -c Release -r win-x64 `
