@@ -1,0 +1,28 @@
+{
+    "ItunesLibraryPath": "C:\\path\\to\\my\\iTunes Music Library.xml",
+    "ItunesPlaylists": [
+        {
+            "Id": 11111,
+            "Name": "Library",
+            "Tracks": null,
+            "MustSync": false
+        },
+        {
+            "Id": 22222,
+            "Name": "5 Stars",
+            "Tracks": null,
+            "MustSync": true
+        }
+    ],
+    "PlexApiBaseUrl": "http://my-server-ip:32400/",
+    "PlexApiToken": "token",
+    "PlexLibrarySections": [
+        {
+            "Key": "1",
+            "Title": "Music",
+            "IsSelected": true
+        }
+    ],
+    "MustSyncRatings": true,
+    "MustSyncPlaylists": true
+}
