@@ -12,13 +12,12 @@ namespace Test.IntegrationTests {
             var config = new ConfigurationBuilder()
                 .AddUserSecrets<ConfigTest>()
                 .Build();
-            TestConfigPath = config["testConfigPath"];
+            TestConfigPath = config["testConfigPath"]!;
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ConfigNotDefined() {
-            AppConfig.GetConfig(string.Empty);
+            Assert.Throws<ArgumentNullException>(() => AppConfig.GetConfig(string.Empty));
         }
 
         [TestMethod]
@@ -36,9 +35,9 @@ namespace Test.IntegrationTests {
         }
 
         [TestMethod]
-        public void HappyPath_SaveConfigASync() {
+        public async Task HappyPath_SaveConfigASync() {
             var testPath = @"C:\Temp\HappyPath_SaveConfigASync.json";
-            AppConfig.SaveConfigASync(new Config(), testPath);
+            await AppConfig.SaveConfigASync(new Config(), testPath);
             Assert.IsTrue(File.Exists(testPath));
         }
     }

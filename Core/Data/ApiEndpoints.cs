@@ -13,5 +13,6 @@ namespace Core.Data {
 
         public const string All = "/all";
         public const string Items = "/items";
+        public const string Move = "/move";
     }
 }

@@ -2,22 +2,22 @@
 {
     public class PlexServerResponse
     {
-        public ServerMediaContainer MediaContainer { get; set; }
+        public required ServerMediaContainer MediaContainer { get; set; }
     }
 
     public class ServerMediaContainer
     {
-        public int size { get; set; }
-        public bool allowSync { get; set; }
-        public string countryCode { get; set; }
-        public string friendlyName { get; set; }
-        public bool hubSearch { get; set; }
-        public bool multiuser { get; set; }
-        public string machineIdentifier { get; set; }
-        public bool myPlex { get; set; }
-        public string platform { get; set; }
-        public string platformVersion { get; set; }
-        public string version { get; set; }
+        public int Size { get; set; }
+        public bool AllowSync { get; set; }
+        public required string CountryCode { get; set; }
+        public required string FriendlyName { get; set; }
+        public bool HubSearch { get; set; }
+        public bool Multiuser { get; set; }
+        public required string MachineIdentifier { get; set; }
+        public bool MyPlex { get; set; }
+        public required string Platform { get; set; }
+        public required string PlatformVersion { get; set; }
+        public required string Version { get; set; }
     }
 }
 

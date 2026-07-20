@@ -24,13 +24,16 @@ namespace Core.Data {
             if (!response.IsSuccessful)
                 throw new InvalidOperationException($"Get failed with {response.StatusCode}, {response.StatusDescription}: {req.Uri}");
 
+            if (string.IsNullOrWhiteSpace(response.Content))
+                throw new InvalidOperationException($"Get returned empty content for {req.Uri}");
+
             return new RestApiResponse<T> {
                 Request = JsonSerializer.Serialize(response.Request),
                 StatusCode = response.StatusCode.ToString(),
                 StatusDescription = response.StatusDescription ?? string.Empty,
                 ResponseUri = response.ResponseUri?.AbsoluteUri ?? string.Empty,
                 IsSuccessful = response.IsSuccessful,
-                Data = JsonSerializer.Deserialize<T>(response.Content)
+                Data = JsonSerializer.Deserialize<T>(response.Content)!
             };
         }
 
@@ -46,13 +49,16 @@ namespace Core.Data {
             if (!response.IsSuccessful)
                 throw new InvalidOperationException($"Post failed with {response.StatusCode}, {response.StatusDescription}: {req.Uri}");
 
+            if (string.IsNullOrWhiteSpace(response.Content))
+                throw new InvalidOperationException($"Get returned empty content for {req.Uri}");
+
             return new RestApiResponse<T> {
                 Request = JsonSerializer.Serialize(response.Request),
                 StatusCode = response.StatusCode.ToString(),
-                StatusDescription = response.StatusDescription,
-                ResponseUri = response.ResponseUri.AbsoluteUri,
+                StatusDescription = response.StatusDescription ?? string.Empty,
+                ResponseUri = response.ResponseUri?.AbsoluteUri ?? string.Empty,
                 IsSuccessful = response.IsSuccessful,
-                Data = JsonSerializer.Deserialize<T>(response.Content)
+                Data = JsonSerializer.Deserialize<T>(response.Content)!
             };
         }
 
@@ -71,8 +77,8 @@ namespace Core.Data {
             return new RestApiResponse {
                 Request = JsonSerializer.Serialize(response.Request),
                 StatusCode = response.StatusCode.ToString(),
-                StatusDescription = response.StatusDescription,
-                ResponseUri = response.ResponseUri.AbsoluteUri,
+                StatusDescription = response.StatusDescription ?? string.Empty,
+                ResponseUri = response.ResponseUri?.AbsoluteUri ?? string.Empty,
                 IsSuccessful = response.IsSuccessful
             };
         }
@@ -89,13 +95,16 @@ namespace Core.Data {
             if (!response.IsSuccessful)
                 throw new InvalidOperationException($"Put failed with {response.StatusCode}, {response.StatusDescription}: {req.Uri}");
 
+            if (string.IsNullOrWhiteSpace(response.Content))
+                throw new InvalidOperationException($"Get returned empty content for {req.Uri}");
+
             return new RestApiResponse<T> {
                 Request = JsonSerializer.Serialize(response.Request),
                 StatusCode = response.StatusCode.ToString(),
-                StatusDescription = response.StatusDescription,
-                ResponseUri = response.ResponseUri.AbsoluteUri,
+                StatusDescription = response.StatusDescription ?? string.Empty,
+                ResponseUri = response.ResponseUri?.AbsoluteUri ?? string.Empty,
                 IsSuccessful = response.IsSuccessful,
-                Data = JsonSerializer.Deserialize<T>(response.Content)
+                Data = JsonSerializer.Deserialize<T>(response.Content)!
             };
         }
 
@@ -114,8 +123,8 @@ namespace Core.Data {
             return new RestApiResponse {
                 Request = JsonSerializer.Serialize(response.Request),
                 StatusCode = response.StatusCode.ToString(),
-                StatusDescription = response.StatusDescription,
-                ResponseUri = response.ResponseUri.AbsoluteUri,
+                StatusDescription = response.StatusDescription ?? string.Empty,
+                ResponseUri = response.ResponseUri?.AbsoluteUri ?? string.Empty,
                 IsSuccessful = response.IsSuccessful
             };
         }

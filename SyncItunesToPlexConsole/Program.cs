@@ -6,6 +6,7 @@ using Core.Services;
 namespace SyncItunesToPlexConsole {
     internal class Program {
         // TODO this would be nice as a GUI, maybe someday
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         private static Config _config;
 
         private static Itunes _itunesDb;
@@ -14,6 +15,7 @@ namespace SyncItunesToPlexConsole {
 
         private static string _plexServerUri;
         private static List<(ItunesTrack, PlexTrack)> _matchedTracks;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
         async static Task Main() {
             try {
@@ -30,7 +32,7 @@ namespace SyncItunesToPlexConsole {
 
                 // if playlists must sync, do it
                 if (_config.MustSyncPlaylists) {
-                    var playlistsToSync = _config.ItunesPlaylists.Where(i => i.MustSync).ToList();
+                    var playlistsToSync = _config.ItunesPlaylists?.Where(i => i.MustSync).ToList() ?? [];
                     Console.WriteLine($"{DateTime.Now:yyMMdd HH:mm:ss} - Retrieved iTunes playlists to sync.");
 
                     SyncPlaylists(playlistsToSync, plexPlaylists);
@@ -72,14 +74,14 @@ namespace SyncItunesToPlexConsole {
             var appLocation = Path.GetDirectoryName(Environment.ProcessPath);
             if (string.IsNullOrWhiteSpace(appLocation))
                 ExitApp("Unable to get current assembly location");
-            var configPath = Path.Combine(appLocation, "config.json");
+            var configPath = Path.Combine(appLocation!, "config.json");
             if (!File.Exists(configPath)) {
                 await AppConfig.SaveConfigASync(new Config(), configPath);
             }
 
             _config = AppConfig.GetConfig(configPath);
 
-            SetupItunesConfig(configPath);
+            await SetupItunesConfig(configPath);
 
             return await SetupPlexConfig(configPath);
         }
@@ -95,16 +97,16 @@ namespace SyncItunesToPlexConsole {
             if (string.IsNullOrWhiteSpace(_config.PlexApiToken))
                 ExitApp("Plex API token not set");
 
-            var restApiService = new RestApiService(_config.PlexApiBaseUrl);
-            _plexDb = new(restApiService, _config.PlexApiToken);
+            var restApiService = new RestApiService(_config.PlexApiBaseUrl!);
+            _plexDb = new(restApiService, _config.PlexApiToken!);
 
             _plexServerUri = $"server://{_plexDb.GetServerId()}/com.plexapp.plugins.library";
 
             if (_config.PlexLibrarySections == null || _config.PlexLibrarySections.Count == 0) {
                 _config.PlexLibrarySections = _plexDb.GetSectionsByType(SectionTypes.Music)
                     .Select(c => new PlexSectionConfig { 
-                        Key = c.key,
-                        Title = c.title,
+                        Key = c.Key,
+                        Title = c.Title,
                         IsSelected = false
                     })
                     .ToList();
@@ -116,8 +118,8 @@ namespace SyncItunesToPlexConsole {
                 ExitApp("Plex library section to sync is not set");
 
             return new PlexSection {
-                key = psConfig.Key,
-                title = psConfig.Title
+                Key = psConfig!.Key,
+                Title = psConfig.Title
             };
         }
 
@@ -125,7 +127,7 @@ namespace SyncItunesToPlexConsole {
         /// Set up iTunes config parameters.
         /// </summary>
         /// <param name="configPath"></param>
-        private async static void SetupItunesConfig(string configPath) {
+        private async static Task SetupItunesConfig(string configPath) {
             if (string.IsNullOrWhiteSpace(_config.ItunesLibraryPath))
                 ExitApp("iTunes library path not set");
             if (!File.Exists(_config.ItunesLibraryPath))
@@ -139,19 +141,19 @@ namespace SyncItunesToPlexConsole {
             }
 
             // sync config playlists with current iTunes playlists and save back to file
-            SyncCurrentItunesPlaylistsWithConfig(configPath);
+            await SyncCurrentItunesPlaylistsWithConfig(configPath);
         }
 
-        private async static void SyncCurrentItunesPlaylistsWithConfig(string configPath) {
+        private async static Task SyncCurrentItunesPlaylistsWithConfig(string configPath) {
             // iTunes can change the ID's, so need to sync config if needed
             var currentItunesPlaylists = _itunesDb.GetPlaylists().ToList();
 
-            var diff = currentItunesPlaylists.Except(_config.ItunesPlaylists, new ItunesPlaylistComparer());
+            var diff = currentItunesPlaylists.Except(_config.ItunesPlaylists!, new ItunesPlaylistComparer());
             if (diff.Count() == 0)
                 return;
 
             foreach (var newPC in currentItunesPlaylists) {
-                var oldPC = _config.ItunesPlaylists.FirstOrDefault(p => p.Name == newPC.Name);
+                var oldPC = _config.ItunesPlaylists!.FirstOrDefault(p => p.Name == newPC.Name);
                 if (oldPC == null)
                     continue;
 
@@ -187,14 +189,13 @@ namespace SyncItunesToPlexConsole {
                     continue;
 
                 iTracks = _itunesDb.GetPlaylistTracks(iPlaylist.Id).ToList();
-                plexPlaylist = plexPlaylists.FirstOrDefault(p => p.title == iPlaylist.Name);
-                if (plexPlaylist == null) { // create new playlist and add all tracks
-                    plexTracks = _matchedTracks.Where(m =>
-                        iTracks.Any(m2 => m2.Id == m.Item1.Id))
-                        .Select(m => m.Item2)
-                        .ToList();
 
-                    _plexDb.CreatePlaylist(_plexServerUri, iPlaylist.Name, plexTracks);
+                // Plex tracks in iTunes playlist order (iTunes tracks with no Plex match are dropped)
+                var orderedPlexTracks = GetOrderedPlexTracks(iTracks);
+
+                plexPlaylist = plexPlaylists.FirstOrDefault(p => p.Title == iPlaylist.Name);
+                if (plexPlaylist == null) { // create new playlist with tracks in iTunes order
+                    _plexDb.CreatePlaylist(_plexServerUri, iPlaylist.Name, orderedPlexTracks);
                 }
                 else { // sync iTunes playlist with Plex
                     plexTracks = _plexDb.GetPlaylistTracks(plexPlaylist.Id).ToList();
@@ -204,9 +205,9 @@ namespace SyncItunesToPlexConsole {
                     iTracks.All(t2 => !t2.EqualsPlexTrack(t)))
                     .ToList();
                     foreach (var tRemove in tracksToRemove) {
-                        if (tRemove.playlistItemID == null)
+                        if (tRemove.PlaylistItemID == null)
                             continue;
-                        _plexDb.DeletePlaylistItem(plexPlaylist.Id, (long) tRemove.playlistItemID);
+                        _plexDb.DeletePlaylistItem(plexPlaylist.Id, (long) tRemove.PlaylistItemID);
                     }
 
                     // sync any iTunes tracks that don't exist in Plex
@@ -218,9 +219,50 @@ namespace SyncItunesToPlexConsole {
                     .Select(m => m.Item2)
                     .ToList();
                     _plexDb.AddItemsToPlaylist(_plexServerUri, plexPlaylist.Id, tracksToAdd);
+
+                    // reorder the Plex playlist to match iTunes track order
+                    ReorderPlaylist(plexPlaylist.Id, orderedPlexTracks);
                 }
 
                 Console.WriteLine($"{DateTime.Now:yyMMdd HH:mm:ss} - Synchronized {iPlaylist.Name}.");
+            }
+        }
+
+        /// <summary>
+        /// Map iTunes playlist tracks to their matched Plex tracks, preserving iTunes playlist order.
+        /// iTunes tracks that were not matched to a Plex track are dropped.
+        /// </summary>
+        private static List<PlexTrack> GetOrderedPlexTracks(IEnumerable<ItunesTrack> iTracks) {
+            return iTracks
+                .Select(i => _matchedTracks.FirstOrDefault(m => m.Item1.Id == i.Id).Item2)
+                .Where(t => t != null)
+                .Cast<PlexTrack>()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Reorder a Plex playlist so its items match the given desired order.
+        /// Moves every track into place on each run: the first desired track is moved to the head,
+        /// and each subsequent track is moved to sit directly after the previous one.
+        /// </summary>
+        private static void ReorderPlaylist(long playlistId, List<PlexTrack> orderedPlexTracks) {
+            if (orderedPlexTracks.Count == 0)
+                return;
+
+            // re-fetch to get current playlistItemIDs, including tracks just added
+            var currentTracks = _plexDb.GetPlaylistTracks(playlistId).ToList();
+            var itemIdByTrackId = currentTracks
+                .Where(t => t.PlaylistItemID != null)
+                .GroupBy(t => t.Id)
+                .ToDictionary(g => g.Key, g => (long) g.First().PlaylistItemID!);
+
+            long? previousItemId = null;
+            foreach (var track in orderedPlexTracks) {
+                if (!itemIdByTrackId.TryGetValue(track.Id, out var itemId))
+                    continue;
+
+                _plexDb.MovePlaylistItem(playlistId, itemId, previousItemId);
+                previousItemId = itemId;
             }
         }
 
@@ -235,7 +277,7 @@ namespace SyncItunesToPlexConsole {
 
         private static void SyncAlbumRatings() {
             var albumRatings = _matchedTracks
-                .GroupBy(g => g.Item2.parentRatingKey)
+                .GroupBy(g => g.Item2.ParentRatingKey)
                 .Select(s => new PlexItemRating {
                     Id = s.First().Item2.Id,
                     Rating = (Helpers.RoundTo20(s.Average(a => a.Item1.Rating)) / 10)
@@ -249,7 +291,7 @@ namespace SyncItunesToPlexConsole {
 
         private static void SyncArtistRatings() {
             var artistRatings = _matchedTracks
-                .GroupBy(g => g.Item2.grandparentRatingKey)
+                .GroupBy(g => g.Item2.GrandparentRatingKey)
                 .Select(s => new PlexItemRating {
                     Id = s.First().Item2.Id,
                     Rating = (Helpers.RoundTo20(s.Average(a => a.Item1.Rating)) / 10)

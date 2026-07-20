@@ -3,12 +3,12 @@
 namespace Core.Dto {
     public class PlexPlaylistsResponse
     {
-        public PlaylistsMediaContainer MediaContainer { get; set; }
+        public required PlaylistsMediaContainer MediaContainer { get; set; }
     }
 
     public class PlaylistsMediaContainer {
-        public int size { get; set; }
-        public List<PlexPlaylist> Metadata { get; set; }
+        public int Size { get; set; }
+        public required List<PlexPlaylist> Metadata { get; set; }
     }
 }
 

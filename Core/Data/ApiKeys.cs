@@ -9,5 +9,6 @@
         public const string Rating = "rating";
         public const string Smart = "smart";
         public const string Title = "title";
+        public const string After = "after";
     }
 }
