@@ -3,21 +3,21 @@
 namespace Core.Dto {
     public class PlexTracksResponse
     {
-        public TracksMediaContainer MediaContainer { get; set; }
+        public required TracksMediaContainer MediaContainer { get; set; }
     }
 
     public class TracksMediaContainer {
-        public int size { get; set; }
-        public bool allowSync { get; set; }
-        public string identifier { get; set; }
-        public int librarySectionID { get; set; }
-        public string librarySectionTitle { get; set; }
-        public string librarySectionUUID { get; set; }
-        public string title1 { get; set; }
-        public string title2 { get; set; }
-        public string viewGroup { get; set; }
+        public int Size { get; set; }
+        public bool AllowSync { get; set; }
+        public required string Identifier { get; set; }
+        public int LibrarySectionID { get; set; }
+        public required string LibrarySectionTitle { get; set; }
+        public required string LibrarySectionUUID { get; set; }
+        public required string Title1 { get; set; }
+        public required string Title2 { get; set; }
+        public required string ViewGroup { get; set; }
 
-        public List<PlexTrack> Metadata { get; set; }
+        public required List<PlexTrack> Metadata { get; set; }
     }
 }
 

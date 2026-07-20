@@ -1,49 +1,49 @@
 ﻿namespace Core.Models {
     public class PlexTrack {
-        public long Id => long.Parse(ratingKey);
-        public string FileName => Media?.FirstOrDefault()
-                                    .Part?.FirstOrDefault()
-                                    .file ?? string.Empty;
+        public long Id => long.Parse(RatingKey);
+        public string FileName => Media?.FirstOrDefault()!
+                                    .Part?.FirstOrDefault()!
+                                    .File ?? string.Empty;
 
-        public string ratingKey { get; set; }
-        public string key { get; set; }
-        public string guid { get; set; }
-        public string type { get; set; }
-        public string title { get; set; }
-        public decimal userRating { get; set; }
+        public required string RatingKey { get; set; }
+        public required string Key { get; set; }
+        public required string Guid { get; set; }
+        public required string Type { get; set; }
+        public required string Title { get; set; }
+        public decimal UserRating { get; set; }
 
-        public string parentRatingKey { get; set; }
-        public string parentKey { get; set; }
-        public string parentGuid { get; set; }
-        public string parentStudio { get; set; }
-        public string parentTitle { get; set; }
+        public required string ParentRatingKey { get; set; }
+        public required string ParentKey { get; set; }
+        public required string ParentGuid { get; set; }
+        public required string ParentStudio { get; set; }
+        public required string ParentTitle { get; set; }
 
-        public string grandparentRatingKey { get; set; }
-        public string grandparentKey { get; set; }
-        public string grandparentGuid { get; set; }
-        public string grandparentTitle { get; set; }
+        public required string GrandparentRatingKey { get; set; }
+        public required string GrandparentKey { get; set; }
+        public required string GrandparentGuid { get; set; }
+        public required string GrandparentTitle { get; set; }
 
-        public long? playlistItemID { get; set; }
+        public long? PlaylistItemID { get; set; }
 
-        public List<PlexTrackMedia> Media { get; set; }
+        public required List<PlexTrackMedia> Media { get; set; }
 
-        public string ShortFileName { get; set; }
-        public string ShortAlbumName { get; set; } = string.Empty;
-        public string ShortArtistName { get; set; } = string.Empty;
+        public required string ShortFileName { get; set; }
+        public required string ShortAlbumName { get; set; } = string.Empty;
+        public required string ShortArtistName { get; set; } = string.Empty;
     }
 
     public class PlexTrackMedia {
-        public long id { get; set; }
-        public string container { get; set; }
+        public long Id { get; set; }
+        public required string Container { get; set; }
 
-        public List<PlexTrackMediaPart> Part { get; set; }
+        public required List<PlexTrackMediaPart> Part { get; set; }
     }
 
     public class PlexTrackMediaPart {
-        public long id { get; set; }
-        public string key { get; set; }
-        public string file { get; set; }
-        public string container { get; set; }
+        public long Id { get; set; }
+        public required string Key { get; set; }
+        public required string File { get; set; }
+        public required string Container { get; set; }
     }
 
     public class PlexItemRating { 

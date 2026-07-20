@@ -24,11 +24,11 @@ namespace Core.Services
 
             var request = new RestApiRequest {
                 Uri = ApiEndpoints.Playlists,
-                Params = new List<RestApiParam> {
+                Params = [
                     _apiToken,
                     new RestApiParam { Key = ApiKeys.SectionId, Value = sectionId.ToString() },
                     new RestApiParam { Key = ApiKeys.Type, Value = MediaTypes.Playlist.ToString() }
-                }
+                ]
             };
 
             var response = _restApiService.Get<PlexPlaylistsResponse>(request).Data;
@@ -44,10 +44,10 @@ namespace Core.Services
 
             var request = new RestApiRequest {
                 Uri = $"{ApiEndpoints.LibrarySections}/{sectionId}{ApiEndpoints.All}",
-                Params = new List<RestApiParam> { 
+                Params = [ 
                     _apiToken,
                     new RestApiParam { Key = ApiKeys.Type, Value = MediaTypes.Track.ToString() }
-                }
+                ]
             };
 
             var response = _restApiService.Get<PlexTracksResponse>(request).Data;
@@ -74,7 +74,7 @@ namespace Core.Services
 
             var request = new RestApiRequest { 
                 Uri = ApiEndpoints.LibrarySections,
-                Params = new List<RestApiParam> { _apiToken}
+                Params = [_apiToken]
             };
 
             var response = _restApiService.Get<PlexLibrarySectionsResponse>(request).Data;
@@ -82,7 +82,7 @@ namespace Core.Services
                 throw new NullReferenceException(nameof(PlexLibrarySectionsResponse));
 
             return response.MediaContainer.Directory
-                .Where(d => d.type == sectionType)
+                .Where(d => d.Type == sectionType)
                 .ToList();
         }
 
@@ -122,7 +122,7 @@ namespace Core.Services
             if (response == null)
                 throw new NullReferenceException(nameof(PlexServerResponse));
 
-            return response.MediaContainer.machineIdentifier;
+            return response.MediaContainer.MachineIdentifier;
         }
 
         #endregion Get Methods
@@ -137,10 +137,10 @@ namespace Core.Services
 
             var request = new RestApiRequest { 
                 Uri = $"{ApiEndpoints.Playlists}/{id}",
-                Params = new List<RestApiParam> {
+                Params = [
                     _apiToken,
                     new RestApiParam { Key = ApiKeys.Summary, Value = summary }
-                }
+                ]
             };
 
             _restApiService.Put(request);
@@ -161,10 +161,10 @@ namespace Core.Services
 
             var request = new RestApiRequest {
                 Uri = $"{ApiEndpoints.Playlists}/{playlistId}{ApiEndpoints.Items}",
-                Params = new List<RestApiParam> {
+                Params = [
                     _apiToken,
                     new RestApiParam { Key = ApiKeys.Uri, Value = itemsUri },
-                }
+                ]
             };
 
             var response = _restApiService.Put<PlexPlaylistsResponse>(request);
@@ -183,13 +183,35 @@ namespace Core.Services
 
             var request = new RestApiRequest {
                 Uri = ApiEndpoints.Rate,
-                Params = new List<RestApiParam> {
+                Params = [
                     _apiToken,
                     new RestApiParam { Key = ApiKeys.Identifier, Value = ApiValues.DefaultIdentifier },
                     new RestApiParam { Key = ApiKeys.Key, Value = id.ToString() },
                     new RestApiParam { Key = ApiKeys.Rating, Value = rating.ToString() }
-                }
+                ]
             };
+
+            _restApiService.Put(request);
+            return true;
+        }
+
+        /// <summary>
+        /// Move a playlist item to sit directly after another item in the playlist.
+        /// Pass a null afterPlaylistItemId to move the item to the head of the playlist.
+        /// </summary>
+        public bool MovePlaylistItem(long playlistId, long playlistItemId, long? afterPlaylistItemId) {
+            if (playlistId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(playlistId));
+            if (playlistItemId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(playlistItemId));
+
+            var request = new RestApiRequest {
+                Uri = $"{ApiEndpoints.Playlists}/{playlistId}{ApiEndpoints.Items}/{playlistItemId}{ApiEndpoints.Move}",
+                Params = [_apiToken]
+            };
+
+            if (afterPlaylistItemId != null)
+                request.Params.Add(new RestApiParam { Key = ApiKeys.After, Value = afterPlaylistItemId.Value.ToString() });
 
             _restApiService.Put(request);
             return true;
@@ -205,7 +227,7 @@ namespace Core.Services
             if (string.IsNullOrWhiteSpace(title))
                 throw new ArgumentNullException(nameof(title));
 
-            if (tracks == null || tracks.Count() == 0)
+            if (tracks == null || !tracks.Any())
                 return false;
 
             var plexKeys = string.Join(",", tracks.Select(t => t.Id));
@@ -213,13 +235,13 @@ namespace Core.Services
 
             var request = new RestApiRequest {
                 Uri = $"{ApiEndpoints.Playlists}",
-                Params = new List<RestApiParam> { 
+                Params = [ 
                     _apiToken,
                     new RestApiParam { Key = ApiKeys.Type, Value = ApiValues.Audio },
                     new RestApiParam { Key = ApiKeys.Smart, Value = "0" },
                     new RestApiParam { Key = ApiKeys.Title, Value = title },
                     new RestApiParam { Key = ApiKeys.Uri, Value = itemsUri },
-                }
+                ]
             };
 
             var response = _restApiService.Post<PlexPlaylistsResponse>(request);
@@ -250,7 +272,7 @@ namespace Core.Services
 
             var request = new RestApiRequest {
                 Uri = $"{ApiEndpoints.Playlists}/{playlistId}{ApiEndpoints.Items}/{playlistItemId}",
-                Params = new List<RestApiParam> { _apiToken }
+                Params = [_apiToken]
             };
 
             _restApiService.Delete(request);

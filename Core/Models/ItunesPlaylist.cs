@@ -8,12 +8,14 @@ namespace Core.Models {
         public bool MustSync { get; set; } = true;
 
         public override string ToString() {
-            return $"{Id}:{Name} - {Tracks.Count()} tracks";
+            return $"{Id}:{Name} - {Tracks?.Count() ?? 0} tracks";
         }
     }
 
     public class ItunesPlaylistComparer : IEqualityComparer<ItunesPlaylist> {
         public bool Equals(ItunesPlaylist? x, ItunesPlaylist? y) {
+            if (ReferenceEquals(x, y)) return true;
+            if (x is null || y is null) return false;
             return x.Id == y.Id && x.Name == y.Name;
         }
 

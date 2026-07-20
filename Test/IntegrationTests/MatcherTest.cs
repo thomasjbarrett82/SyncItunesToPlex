@@ -61,7 +61,7 @@ namespace Test.IntegrationTests {
             var results = svc.MatchItunesToPlexTracks(_sectionId);
 
             var ratings = results
-                .GroupBy(g => g.Item2.parentRatingKey)
+                .GroupBy(g => g.Item2.ParentRatingKey)
                 .Select(s => new PlexItemRating { 
                     Id = s.First().Item2.Id,
                     Rating = (Helpers.RoundTo20(s.Average(a => a.Item1.Rating)) / 10)
@@ -80,7 +80,7 @@ namespace Test.IntegrationTests {
             var results = svc.MatchItunesToPlexTracks(_sectionId);
 
             var ratings = results
-                .GroupBy(g => g.Item2.grandparentRatingKey)
+                .GroupBy(g => g.Item2.GrandparentRatingKey)
                 .Select(s => new PlexItemRating {
                     Id = s.First().Item2.Id,
                     Rating = (Helpers.RoundTo20(s.Average(a => a.Item1.Rating)) / 10)

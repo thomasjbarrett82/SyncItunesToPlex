@@ -1,17 +1,17 @@
 ﻿namespace Core.Models {
     public class PlexPlaylist {
-        public long Id => long.Parse(ratingKey);
+        public long Id => long.Parse(RatingKey);
 
-        public string ratingKey { get; set; }
-        public string key { get; set; }
-        public string guid { get; set; }
-        public string type { get; set; }
-        public string title { get; set; }
-        public string titleSort { get; set; }
-        public string summary { get; set; }
-        public bool smart { get; set; }
-        public string playlistType { get; set; }
-        public string composite { get; set; }
-        public string icon { get; set; }
+        public required string RatingKey { get; set; }
+        public required string Key { get; set; }
+        public required string Guid { get; set; }
+        public required string Type { get; set; }
+        public required string Title { get; set; }
+        public required string TitleSort { get; set; }
+        public required string Summary { get; set; }
+        public bool Smart { get; set; }
+        public required string PlaylistType { get; set; }
+        public required string Composite { get; set; }
+        public required string Icon { get; set; }
     }
 }

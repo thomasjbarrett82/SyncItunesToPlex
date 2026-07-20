@@ -1,9 +1,9 @@
 ﻿namespace Core.Models {
     public class PlexSection {
-        public long Id => long.Parse(key);
+        public long Id => long.Parse(Key);
 
-        public string key { get; set; }
-        public string title { get; set; }
-        public string? type { get; set; }
+        public required string Key { get; set; }
+        public required string Title { get; set; }
+        public string? Type { get; set; }
     }
 }
